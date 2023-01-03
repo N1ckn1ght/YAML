@@ -7,21 +7,29 @@ function Segment:create(p1, p2)
     segment.p1      = p1
     segment.p2      = p2
     segment.mag     = nil
-    segment.angle   = nil
+    segment.heading = nil
     segment.normals = nil
+    segment.color   = {1, 1, 1, 1}
     segment:init()
     return segment
 end
 
 function Segment:init()
-    local diff = p2:sub(p1)
-    self.angle = diff:heading()
-    self.mag   = diff:mag()
+    local diff   = Vector:create(self.p2.x - self.p1.x, self.p2.y - self.p1.y)
+    self.heading = diff:heading()
+    self.mag     = diff:mag()
     self.normals = {{-diff.y, diff.x}, {diff.x, diff.y}}
 end
 
-function Segment:draw()
-    draw({p1.x, p1.y, p2.x, p2.y}, "line")
+function Segment:draw(offsetX, offsetY, scaleX, scaleY)
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.push()
+    love.graphics.translate(offsetX, offsetY)
+    love.graphics.scale(scaleX, scaleY)
+    love.graphics.setColor(self.color)
+    love.graphics.line(self.p1.x, self.p1.y, self.p2.x, self.p2.y)
+    love.graphics.pop()
+    love.graphics.setColor(r, g, b, a)
 end
 
 -- Collision detection --
