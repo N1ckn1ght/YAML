@@ -37,6 +37,8 @@ end
 
 function love.draw()
     CurrentGame:draw()
+    showStat(CurrentGame.ship.location.x, 30, 10, 160, 18, 0.7, 0, "x: ")
+    showStat(CurrentGame.ship.location.y, 30, 40, 160, 18, 0.7, 0, "y: ")
 end
 
 function love.keypressed(key)
@@ -49,4 +51,15 @@ function love.keypressed(key)
     end
 
     print("Location:", CurrentGame.ship.location)
+end
+
+function showStat(metric, x, y, width, fontSize, transparency, mantissa, addText)
+    local r, g, b, a = love.graphics.getColor()
+    metric = string.format("%."..mantissa.."f", metric)
+    addText = addText or ""
+    love.graphics.setColor(0, 0, 0, transparency)
+    love.graphics.polygon("fill", {x - width * 0.5, y - fontSize * 0.2, x + width * 0.5, y - fontSize * 0.2, x + width * 0.5, y + fontSize * 1.2, x - width * 0.5, y + fontSize * 1.2})
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.printf(addText..metric, love.graphics.newFont(fontSize), x - width * 0.5, y, width, 'center')
+    love.graphics.setColor(r, g, b, a)
 end
