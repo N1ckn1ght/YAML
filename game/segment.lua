@@ -8,7 +8,6 @@ function Segment:create(p1, p2)
     segment.p2      = p2
     segment.mag     = nil
     segment.heading = nil
-    segment.normals = nil
     segment.color   = {1, 1, 1, 1}
     segment:init()
     return segment
@@ -18,7 +17,10 @@ function Segment:init()
     local diff   = Vector:create(self.p2.x - self.p1.x, self.p2.y - self.p1.y)
     self.heading = diff:heading()
     self.mag     = diff:mag()
-    self.normals = {{-diff.y, diff.x}, {diff.x, diff.y}}
+
+    -- Collision detection --
+    self.normals  = {{-diff.y, diff.x}, {diff.x, diff.y}}
+    self.vertices = {{self.p1.x, Height * 2}, {self.p1.x, self.p1.y}, {self.p2.x, self.p2.y}}
 end
 
 function Segment:draw(offsetX, offsetY, scaleX, scaleY)

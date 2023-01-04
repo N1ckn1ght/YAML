@@ -14,31 +14,20 @@ function love.load()
 end
 
 function love.update(dt)
-    CurrentGame.ship.velocity = Vector:create(0, 0)
-    if (love.keyboard.isDown("w")) then
-        CurrentGame.ship.velocity = Vector:create(0, -90)
-        print("Velocity:", CurrentGame.ship.velocity)
-    end
-    if (love.keyboard.isDown("a")) then
-        CurrentGame.ship.velocity = Vector:create(-90, 0)
-        print("Velocity:", CurrentGame.ship.velocity)
-    end
-    if (love.keyboard.isDown("s")) then
-        CurrentGame.ship.velocity = Vector:create(0, 90)
-        print("Velocity:", CurrentGame.ship.velocity)
-    end
-    if (love.keyboard.isDown("d")) then
-        CurrentGame.ship.velocity = Vector:create(90, 0)
-        print("Velocity:", CurrentGame.ship.velocity)
-    end
+    -- 15 fps min limit (to avoid getting too big delta time when game window is not in focus)
+    dt = math.min(dt, 0.067)
 
     CurrentGame:update(dt)
 end
 
 function love.draw()
     CurrentGame:draw()
-    showStat(CurrentGame.ship.location.x, 30, 10, 160, 18, 0.7, 0, "x: ")
-    showStat(CurrentGame.ship.location.y, 30, 40, 160, 18, 0.7, 0, "y: ")
+    showStat(CurrentGame.ship.location.x, 80, 10,  160, 18, 0.7, 3, "x      : ", "left")
+    showStat(CurrentGame.ship.location.y, 80, 40,  160, 18, 0.7, 3, "y      : ", "left")
+    showStat(CurrentGame.ship.velocity.x, 80, 70,  160, 18, 0.7, 3, "spdX   : ", "left")
+    showStat(CurrentGame.ship.velocity.y, 80, 100, 160, 18, 0.7, 3, "spdY   : ", "left")
+    showStat(CurrentGame.ship.heading   , 80, 130, 160, 18, 0.7, 3, "head   : ", "left")
+    showStat(CurrentGame.ship.fuel      , 80, 160, 160, 18, 0.7, 3, "fuel   : ", "left")
 end
 
 function love.keypressed(key)
@@ -49,17 +38,15 @@ function love.keypressed(key)
     if (key == "g") then
         CurrentGame.camera = CurrentGame.camera % 2 + 1
     end
-
-    print("Location:", CurrentGame.ship.location)
 end
 
-function showStat(metric, x, y, width, fontSize, transparency, mantissa, addText)
+function showStat(metric, x, y, width, fontSize, transparency, mantissa, addText, align)
     local r, g, b, a = love.graphics.getColor()
     metric = string.format("%."..mantissa.."f", metric)
     addText = addText or ""
     love.graphics.setColor(0, 0, 0, transparency)
     love.graphics.polygon("fill", {x - width * 0.5, y - fontSize * 0.2, x + width * 0.5, y - fontSize * 0.2, x + width * 0.5, y + fontSize * 1.2, x - width * 0.5, y + fontSize * 1.2})
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.printf(addText..metric, love.graphics.newFont(fontSize), x - width * 0.5, y, width, 'center')
+    love.graphics.printf(addText..metric, love.graphics.newFont(fontSize), x - width * 0.5, y, width, align)
     love.graphics.setColor(r, g, b, a)
 end
