@@ -26,3 +26,15 @@ function Camera:update()
         self.location.y = self.track.location.y - self.height + self.borders[4]
     end
 end
+
+function Camera:center()
+    self.location = Vector:create(track.location.x - width * 0.5, track.location.y - height * 0.5)
+end
+
+function Camera:saveRelativePosition()
+    self.savedRelativePosition = Vector:create(self.location.x - self.track.location.x, self.location.y - self.track.location.y)
+end
+
+function Camera:loadRelativePosition()
+    self.location = Vector:create(self.savedRelativePosition.x + self.track.location.x, self.savedRelativePosition.y + self.track.location.y)
+end
