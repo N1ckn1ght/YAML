@@ -2,6 +2,7 @@ require "game.camera"
 require "game.game"
 require "game.segment"
 require "game.ship"
+require "game.terrain"
 require "utility.vector"
 require "utility.utility"
 

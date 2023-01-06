@@ -10,20 +10,13 @@ end
 
 function Game:init()
     self.ship = Ship:create(400, 400, 5, 1.6, 25, 1, 1000, 80)
-    self.segments = {}
-    for i = 1, 100 do
-        local ty = -10
-        if (i % 2 == 0) then
-            ty = -ty
-        end
-        self.segments[i] = Segment:create(Vector:create((i - 1) * 20 - 500, Height - ty), Vector:create(i * 20 - 500, Height + ty))
-    end
     self.cameras = {}
     self.cameras[1]   = Camera:create(Width, Height, self.ship)
     self.cameras[2]   = Camera:create(Width * 0.5, Height * 0.5, self.ship)
     self.camera = 1
     self.gravity = 7
     self.friction = 0.05
+    -- self.terrain = Terrain:create(0, 500, 800, 400, 0.4, 0.01, 10, 0.1, 0.1, {{30, 2}})
 end
 
 function Game:update(dt)
@@ -49,7 +42,5 @@ function Game:draw()
     local scaleX  =  self.cameras[self.camera].scaleX
     local scaleY  =  self.cameras[self.camera].scaleY
     self.ship:draw(offsetX, offsetY, scaleX, scaleY)
-    for i = 1, #self.segments do
-        self.segments[i]:draw(offsetX, offsetY, scaleX, scaleY)
-    end
+    -- self.terrain:draw(offsetX, offsetY, scaleX, scaleY)
 end
