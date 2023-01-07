@@ -7,7 +7,7 @@ function Camera:create(width, height, track, borders)
     camera.width     = width
     camera.height    = height
     camera.track     = track
-    camera.borders   = borders or {100, 100, 100, 100}
+    camera.borders   = borders
     camera.location  = Vector:create(track.location.x - width * 0.5, track.location.y - height * 0.5)
     camera.scaleX    = Width / width
     camera.scaleY    = Height / height
@@ -28,7 +28,7 @@ function Camera:update()
 end
 
 function Camera:center()
-    self.location = Vector:create(track.location.x - width * 0.5, track.location.y - height * 0.5)
+    self.location = Vector:create(self.track.location.x - self.width * 0.5, self.track.location.y - self.height * 0.5)
 end
 
 function Camera:saveRelativePosition()

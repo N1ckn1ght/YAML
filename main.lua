@@ -7,12 +7,15 @@ require "utility.vector"
 require "utility.utility"
 
 function love.load()
-    math.randomseed(os.time())
+    local seed = os.time()
+    math.randomseed(seed)
+    print(seed)
+
     Width = love.graphics.getWidth()
     Height = love.graphics.getHeight()
     love.window.setFullscreen(true, "exclusive")
     Fullscreen = true
-
+    
     CurrentGame = Game:create()
 end
 
