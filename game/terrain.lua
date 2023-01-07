@@ -8,19 +8,13 @@ function Terrain:create(x, y, width, height, angleDiffLimit, minLengthX, maxLeng
     terrain.y = y
     terrain.width = width
     terrain.height = height
-    -- Issue 1: due to realisation of terrain gen there probably will be a case of
-    --          generating off-limit angle spike between last and first terrain vertice;
-    -- Issue 3: there may be spikes in some cases (see Step III. Generate terrain by Y);
     terrain.angleDiffLimit = angleDiffLimit
-    -- Issue 2: generating off-minimum-limit by X segment at the end of the terrain;
     terrain.minLengthX = minLengthX
     terrain.maxLengthX = maxLenghtX
-    -- Todo: implement
     terrain.minLengthOfLandable = minLengthOfLandable
     terrain.angleOfLandable = angleOfLandable
     terrain.angleOfSmoothering = angleOfSmoothering
     -- Format: {{length by x, amount}, ...}
-    -- Issue 4: length must be an Integer.
     terrain.guaranteed = tryGenerateGuaranteed
     terrain.segments = {}
     terrain:init()
@@ -151,10 +145,7 @@ function Terrain:init()
         -- Finally, convert angle to vector
         local dy = math.sin(angle) * tempSegmentLengths[i]
         self.segments[i] = Segment:create(Vector:create(previousPoint.x, previousPoint.y), Vector:create(previousPoint.x + tempSegmentLengths[i], previousPoint.y + dy))
-        if (gSegments[i]) then
-            self.segments[i].color = {1, 0, 0, 1}
-        end
-
+        
         -- Prepare next cycle
         previousPoint.x = previousPoint.x + tempSegmentLengths[i]
         previousPoint.y = previousPoint.y + dy
@@ -163,7 +154,7 @@ function Terrain:init()
     -- hotfix to make connected vertices between last and first (this leads to Issue 1)
     self.segments[#tempSegmentLengths] = Segment:create(Vector:create(previousPoint.x, previousPoint.y), Vector:create(previousPoint.x + tempSegmentLengths[#tempSegmentLengths], self.segments[1].p1.y))
 
-    -- debug
+    -- hotfix for weird floating point error, also debug
     for i = 1, #self.segments do
         local diffX = self.segments[i].p2.x - self.segments[i].p1.x
         local diffY = self.segments[i].p2.y - self.segments[i].p1.y
@@ -175,9 +166,31 @@ function Terrain:init()
             print("     : Mathematical error:", math.abs(self.angleOfLandable - math.abs(math.atan2(diffY, diffX))))
         end
     end
+
+    -- set scores for platforms
+    for i = 1, #self.segments do
+        local prev = (i - 2) % #self.segments + 1
+        local next = (i    ) % #self.segments + 1
+        local score = 0
+        if (gSegments[i]) then
+            score = 1
+            if (self.segments[prev].heading > 0 and self.segments[next].heading < 0) then
+                score = score * 1.5
+            end
+            if (self.segments[i].p2.x - self.segments[i].p1.x - self.minLengthOfLandable < (self.maxLengthX - self.minLengthOfLandable) * 0.33) then
+                score = score * 1.5
+            end
+            if (math.abs(self.segments[i].heading) > self.angleOfSmoothering) then
+                score = score * 1.5
+            end
+            self.segments[i]:setScore(score)
+        end
+    end
 end
 
 function Terrain:draw(offsetX, offsetY, scaleX, scaleY)
+    -- Ok for small terrains, very bad for large #self.segments (Issue 5)
+    -- Solution is to get rid of full cycle
     for i = 1, #self.segments do
         self.segments[i]:draw(offsetX, offsetY, scaleX, scaleY)
         self.segments[i]:draw(offsetX - self.width, offsetY, scaleX, scaleY)
