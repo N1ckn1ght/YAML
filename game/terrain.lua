@@ -10,9 +10,9 @@ function Terrain:create(x, y, width, height, angleDiffLimit, minLengthX, maxLeng
     terrain.height = height
     -- Issue 1: due to realisation of terrain gen there probably will be a case of
     --          generating off-limit angle spike between last and first terrain vertice;
-    -- Issue 3: there may be spikes in some cases (see Step III. Generate terrain by Y)
+    -- Issue 3: there may be spikes in some cases (see Step III. Generate terrain by Y);
     terrain.angleDiffLimit = angleDiffLimit
-    -- Issue 2: generating off-minimum-limit by X segment at the end of the terrain.
+    -- Issue 2: generating off-minimum-limit by X segment at the end of the terrain;
     terrain.minLengthX = minLengthX
     terrain.maxLengthX = maxLenghtX
     -- Todo: implement
@@ -20,6 +20,7 @@ function Terrain:create(x, y, width, height, angleDiffLimit, minLengthX, maxLeng
     terrain.angleOfLandable = angleOfLandable
     terrain.angleOfSmoothering = angleOfSmoothering
     -- Format: {{length by x, amount}, ...}
+    -- Issue 4: length must be an Integer.
     terrain.guaranteed = tryGenerateGuaranteed
     terrain.segments = {}
     terrain:init()
@@ -67,7 +68,7 @@ function Terrain:init()
     end
     shuffle(tempSegmentLengths)
 
-    -- dangerous hotfix, but it's necessary to know which are "guaranteed" to possible landing
+    -- dangerous hotfix, but it's necessary to know which are "guaranteed" to possible landing (Issue 4)
     local gSegments = {}
     for i = 1, #tempSegmentLengths do
         if (tempSegmentLengths[i] == math.floor(tempSegmentLengths[i])) then
@@ -177,29 +178,9 @@ function Terrain:init()
 end
 
 function Terrain:draw(offsetX, offsetY, scaleX, scaleY)
-    -- local i = 1
-    -- local m = 0
-    -- local currX = self.segments[i].p1.x
-    -- while (currX < Width * scaleX + offsetX) do
-    --     self.segments[i]:draw(offsetX + self.width * m, offsetY, scaleX, scaleY)
-    --     i = i + 1
-    --     if (i > #self.segments) then
-    --         i = 1
-    --         m = m + 1
-    --     end
-    --     currX = self.segments[i].p1.x + self.width * m
-    -- end
-    -- i = #self.segments
-    -- m = -1
-    -- currX = self.segments[i].p2.x - self.width
-    -- while (currX > -offsetX) do
-    --     self.segments[i]:draw(offsetX + self.width * m, offsetY, scaleX, scaleY)
-    --     i = i - 1
-    --     if (i < 1) then
-    --         i = #self.segments
-    --         m = m - 1
-    --     end
-    --     currX = self.segments[i].p2.x + self.width * m
-    -- end
-    
+    for i = 1, #self.segments do
+        self.segments[i]:draw(offsetX, offsetY, scaleX, scaleY)
+        self.segments[i]:draw(offsetX - self.width, offsetY, scaleX, scaleY)
+        self.segments[i]:draw(offsetX + self.width, offsetY, scaleX, scaleY)
+    end
 end
