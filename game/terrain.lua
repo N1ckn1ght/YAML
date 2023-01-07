@@ -1,7 +1,7 @@
 Terrain = {}
 Terrain.__index = Terrain
 
-function Terrain:create(x, y, width, height, angleDiffLimit, minLengthX, maxLenghtX, minLengthOfLandable, angleOfLandable, angleOfSmoothering, tryGenerateGuaranteed)
+function Terrain:create(x, y, width, height, angleDiffLimit, minLengthX, maxLenghtX, minLengthOfLandable, dangerousLengthOfLandable, angleOfLandable, angleOfSmoothering, tryGenerateGuaranteed)
     local terrain = {}
     setmetatable(terrain, Terrain)
     terrain.x = x
@@ -12,6 +12,7 @@ function Terrain:create(x, y, width, height, angleDiffLimit, minLengthX, maxLeng
     terrain.minLengthX = minLengthX
     terrain.maxLengthX = maxLenghtX
     terrain.minLengthOfLandable = minLengthOfLandable
+    terrain.dangerousLengthOfLandable = dangerousLengthOfLandable
     terrain.angleOfLandable = angleOfLandable
     terrain.angleOfSmoothering = angleOfSmoothering
     -- Format: {{length by x, amount}, ...}
@@ -34,7 +35,7 @@ function Terrain:init()
     local currentWidth = 0
     local tempSegmentLengths = {}
     while (currentWidth < randomWidth) do
-        local x = math.random() * length + self.minLengthX
+        local x = math.random()^(1/4) * length + self.minLengthX
         tempSegmentLengths[#tempSegmentLengths + 1] = x
         currentWidth = currentWidth + x
     end
@@ -96,6 +97,10 @@ function Terrain:init()
             end
             fairRange = randRange - unfairRange
             randRange = unfairRange
+        elseif (gSegments[i]) then
+            minAngleY = math.max(math.atan2( self.y                - previousPoint.y, tempSegmentLengths[i]), -self.angleOfLandable)
+            maxAngleY = math.min(math.atan2((self.y + self.height) - previousPoint.y, tempSegmentLengths[i]), self.angleOfLandable)
+            randRange = -minAngleY + maxAngleY
         end
         -- Terrain generator cannot connect two landable platforms :(
         -- But it also tries to prevent generation of two in a row (see above; also Issue 3)
@@ -145,7 +150,7 @@ function Terrain:init()
         -- Finally, convert angle to vector
         local dy = math.sin(angle) * tempSegmentLengths[i]
         self.segments[i] = Segment:create(Vector:create(previousPoint.x, previousPoint.y), Vector:create(previousPoint.x + tempSegmentLengths[i], previousPoint.y + dy))
-        
+
         -- Prepare next cycle
         previousPoint.x = previousPoint.x + tempSegmentLengths[i]
         previousPoint.y = previousPoint.y + dy
@@ -159,7 +164,7 @@ function Terrain:init()
         local diffX = self.segments[i].p2.x - self.segments[i].p1.x
         local diffY = self.segments[i].p2.y - self.segments[i].p1.y
         if (diffX < self.minLengthOfLandable and math.abs(math.atan2(diffY, diffX)) < self.angleOfLandable) then
-            self.segments[i].color = {1, 1, 1, 1}
+            self.segments[i]:setScore(0)
             print("WARN : Segment", i, "is marked as landable but has length less then minLengthOfLandable")
             print("     : angle", math.atan2(diffY, diffX), "length", diffX)
             print("INFO : Segment set as NOT possible to land on.")
@@ -177,7 +182,7 @@ function Terrain:init()
             if (self.segments[prev].heading > 0 and self.segments[next].heading < 0) then
                 score = score * 1.5
             end
-            if (self.segments[i].p2.x - self.segments[i].p1.x - self.minLengthOfLandable < (self.maxLengthX - self.minLengthOfLandable) * 0.33) then
+            if (self.segments[i].p2.x - self.segments[i].p1.x <= self.dangerousLengthOfLandable) then
                 score = score * 1.5
             end
             if (math.abs(self.segments[i].heading) > self.angleOfSmoothering) then

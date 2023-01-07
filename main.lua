@@ -16,10 +16,15 @@ function love.load()
     love.window.setFullscreen(true, "exclusive")
     Fullscreen = true
     
+    local font = love.graphics.newImageFont("fonts/consolas_24px.png", [[ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-=_+!@#$%^&*()[]{}\|;':",./<>?]])
+    love.graphics.setFont(font)
+    FontSize = 24
+
     CurrentGame = Game:create()
 end
 
 function love.update(dt)
+    
     -- 15 fps min limit (to avoid getting too big delta time when game window is not in focus)
     dt = math.min(dt, 0.067)
 
@@ -28,12 +33,12 @@ end
 
 function love.draw()
     CurrentGame:draw()
-    showStat(CurrentGame.ship.location.x, 80, 10,  160, 18, 0.7, 3, "x      : ", "left")
-    showStat(CurrentGame.ship.location.y, 80, 40,  160, 18, 0.7, 3, "y      : ", "left")
-    showStat(CurrentGame.ship.velocity.x, 80, 70,  160, 18, 0.7, 3, "spdX   : ", "left")
-    showStat(CurrentGame.ship.velocity.y, 80, 100, 160, 18, 0.7, 3, "spdY   : ", "left")
-    showStat(CurrentGame.ship.heading   , 80, 130, 160, 18, 0.7, 3, "head   : ", "left")
-    showStat(CurrentGame.ship.fuel      , 80, 160, 160, 18, 0.7, 3, "fuel   : ", "left")
+    showStat(CurrentGame.ship.location.x, 120, 10,  240, FontSize, 0.7, 3, "x   : ", "left")
+    showStat(CurrentGame.ship.location.y, 120, 40,  240, FontSize, 0.7, 3, "y   : ", "left")
+    showStat(CurrentGame.ship.velocity.x, 120, 70,  240, FontSize, 0.7, 3, "spdX: ", "left")
+    showStat(CurrentGame.ship.velocity.y, 120, 100, 240, FontSize, 0.7, 3, "spdY: ", "left")
+    showStat(CurrentGame.ship.heading   , 120, 130, 240, FontSize, 0.7, 3, "head: ", "left")
+    showStat(CurrentGame.ship.fuel      , 120, 160, 240, FontSize, 0.7, 3, "fuel: ", "left")
 end
 
 function love.keypressed(key)
@@ -59,6 +64,6 @@ function showStat(metric, x, y, width, fontSize, transparency, mantissa, addText
     love.graphics.setColor(0, 0, 0, transparency)
     love.graphics.polygon("fill", {x - width * 0.5, y - fontSize * 0.2, x + width * 0.5, y - fontSize * 0.2, x + width * 0.5, y + fontSize * 1.2, x - width * 0.5, y + fontSize * 1.2})
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.printf(addText..metric, love.graphics.newFont(fontSize), x - width * 0.5, y, width, align)
+    love.graphics.printf(addText..metric, x - width * 0.5, y, width, align)
     love.graphics.setColor(r, g, b, a)
 end

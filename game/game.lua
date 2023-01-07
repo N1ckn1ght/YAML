@@ -9,7 +9,7 @@ function Game:create()
 end
 
 function Game:init()
-    self.ship = Ship:create(900, 250, 4, 1.6, 25, 2, 1000, 15)
+    self.ship = Ship:create(1000, 150, 3.4, 1.3, 30, 2, 1000, 15)
     self.ship.velocity.x = 100
     self.ship.velocity.y = 15
     self.ship.heading = -math.pi
@@ -18,9 +18,9 @@ function Game:init()
     self.cameras[1].location.y = self.cameras[1].location.y + 200
     self.cameras[2]   = Camera:create(Width * 0.5, Height * 0.5, self.ship, {150, 120, 150, 150})
     self.camera = 1
-    self.gravity = 7
+    self.gravity = 8
     self.friction = 0.05
-    self.terrain = Terrain:create(0, 300, 9000, 700, 1.5, 2, 30, 13, 0.08, 0, {{30, 1}, {20, 4}})
+    self.terrain = Terrain:create(0, 200, 6000, 640, 1, 0.05, 20, 11, 16, 0.04, 0, {{20, 1}})
 end
 
 function Game:update(dt)
