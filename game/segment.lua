@@ -35,6 +35,13 @@ function Segment:draw(offsetX, offsetY, scaleX, scaleY)
     love.graphics.translate(offsetX, offsetY)
     love.graphics.setColor(self.color)
     love.graphics.line(self.p1.x, self.p1.y, self.p2.x, self.p2.y)
+
+    if (self.score >= 1) then
+        local px = self.p1.x
+        local py = math.min(self.p1.y, self.p2.y) - 50
+        love.graphics.printf("x"..self.score, px, py, 100, "left")
+    end
+
     love.graphics.pop()
     love.graphics.setColor(r, g, b, a)
 end

@@ -47,15 +47,21 @@ function love.keypressed(key)
         Fullscreen = not Fullscreen
         love.window.setFullscreen(Fullscreen, "exclusive")
     end
+    if (key == "escape") then
+        love.event.quit()
+    end
+    if (key == "f2") then
+        love.event.quit("restart")
+    end
 end
 
-function showStat(metric, x, y, width, fontSize, transparency, mantissa, addText, align)
+function showStat(metric, x, y, width, fontSize, transparency, mantissa, addText, align, color)
     local r, g, b, a = love.graphics.getColor()
     metric = string.format("%."..mantissa.."f", metric)
     addText = addText or ""
     love.graphics.setColor(0, 0, 0, transparency)
     love.graphics.polygon("fill", {x - width * 0.5, y - fontSize * 0.2, x + width * 0.5, y - fontSize * 0.2, x + width * 0.5, y + fontSize * 1.2, x - width * 0.5, y + fontSize * 1.2})
-    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setColor(color or {1, 1, 1, 1})
     love.graphics.printf(addText..metric, x - width * 0.5, y, width, align)
     love.graphics.setColor(r, g, b, a)
 end

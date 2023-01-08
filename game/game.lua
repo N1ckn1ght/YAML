@@ -36,6 +36,7 @@ function Game:init()
     self.relativeAngle = 255
 
     self.state = 1
+    self.score = 0
 end
 
 function Game:update(dt)
@@ -138,7 +139,7 @@ function Game:update(dt)
 
         self.collider:update()
         self:calculateRelativeData(self.nearestSegmentIndex)
-    else
+    elseif (not self.ship.isAlive) then
         self.ship:update(dt)
     end
 end
@@ -161,11 +162,27 @@ function Game:draw()
         showStat(self.ship.velocity.x, Width - 150, 40, 320, FontSize, 0, 0, "HORIZONTAL SPEED ", "left")
         showStat(self.ship.velocity.y, Width - 150, 70, 320, FontSize, 0, 0, "VERTICAL SPEED   ", "left")
     else
-        showStat(self.relativeAngle * 180 / math.pi, Width - 150, 10, 320, FontSize, 0, 0, "RELATIVE ANGLE   ", "left")
-        showStat(self.relativeHorizontalSpeed,       Width - 150, 40, 320, FontSize, 0, 0, "SLIDE SPEED      ", "left")
-        showStat(self.magnitude,                     Width - 150, 70, 320, FontSize, 0, 0, "ABSOLUTE SPEED   ", "left")
+        local color = {1, 1, 1, 1}
+        if (self.relativeAngle > self.safeRelativeAngle) then
+            color = {1, 0, 0, 1}
+        end
+        showStat(self.relativeAngle * 180 / math.pi, Width - 150, 10, 320, FontSize, 0, 0, "RELATIVE ANGLE   ", "left", color)
+        color = {1, 1, 1, 1}
+        if (math.abs(self.relativeHorizontalSpeed) > self.safeLandingSlide) then
+            color = {1, 0, 0, 1}
+        end
+        showStat(self.relativeHorizontalSpeed,       Width - 150, 40, 320, FontSize, 0, 0, "SLIDE SPEED      ", "left", color)
+        color = {1, 1, 1, 1}
+        if (self.magnitude > self.safeLandingSpeed) then
+            color = {1, 0, 0, 1}
+        end
+        showStat(self.magnitude,                     Width - 150, 70, 320, FontSize, 0, 0, "ABSOLUTE SPEED   ", "left", color)
     end
     -- showStat(self.nearestSegmentIndex, 180, 100, 320, FontSize, 0, 0, "SEGMENT           ", "left")
+
+    if (self.state == 0) then
+        showStat(self.score, 180, 100, 320, FontSize, 0, 0, "SCORE     ", "left", {1, 0, 1, 1})
+    end
 end
 
 function Game:onCollision(segments)
@@ -198,7 +215,7 @@ function Game:onCollision(segments)
         print("INFO : It's", self.magnitude, ", but maximum is", self.safeLandingSpeed)
         return
     end
-    if (self.relativeHorizontalSpeed > self.safeLandingSlide) then
+    if (math.abs(self.relativeHorizontalSpeed) > self.safeLandingSlide) then
         self.ship:crash(self.gravity)
         love.audio.play(SoundExplosion)
         print("INFO : Crash because of a big horizontal slide relative to a landing platform")
@@ -213,7 +230,9 @@ function Game:onCollision(segments)
         return
     end
 
-    -- otherwise happy landing!
+    self.ship.colorIdle = {0, 0, 0, 1}
+    self.ship.colorFill = {0, 0, 0, 1}
+    self.score = self.terrain.segments[segments[1]].score * self.ship.fuel
 end
 
 function Game:calculateRelativeData(nearest)
