@@ -1,6 +1,7 @@
 require "game.camera"
 require "game.collider"
 require "game.game"
+require "game.particle"
 require "game.segment"
 require "game.ship"
 require "game.terrain"

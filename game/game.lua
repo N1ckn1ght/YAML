@@ -80,9 +80,19 @@ function Game:update(dt)
         local friction = -self.friction * self.ship.velocity.x
         self.ship:applyForce(Vector:create(friction, self.gravity))
 
+        -- debug cheats
         if (love.keyboard.isDown("p")) then
             self.ship.velocity:mul(0)
             self.ship.acceleration:mul(0)
+        end
+        if (love.keyboard.isDown("[")) then
+            self.ship.velocity.x = self.ship.velocity.x - 40
+        end
+        if (love.keyboard.isDown("]")) then
+            self.ship.velocity.x = self.ship.velocity.x + 40
+        end
+        if (love.keyboard.isDown("\\")) then
+            self.ship.velocity.y = self.ship.velocity.y + 20
         end
 
         self.ship:update(dt)
@@ -128,6 +138,8 @@ function Game:update(dt)
 
         self.collider:update()
         self:calculateRelativeData(self.nearestSegmentIndex)
+    else
+        self.ship:update(dt)
     end
 end
 
@@ -166,13 +178,13 @@ function Game:onCollision(segments)
         print("INFO : Collision confirmed with a segment", segments[i])
     end
     if (#segments > 1) then
-        self.ship:crash()
+        self.ship:crash(self.gravity)
         love.audio.play(SoundExplosion)
         print("INFO : Crash because of a landing on a several segments at a time")
         return
     end
     if (self.terrain.segments[segments[1]].score == 0) then
-        self.ship:crash()
+        self.ship:crash(self.gravity)
         love.audio.play(SoundExplosion)
         print("INFO : Crash because of a landing on a bad platform")
         return
@@ -180,21 +192,21 @@ function Game:onCollision(segments)
 
     self:calculateRelativeData(segments[1])
     if (self.magnitude > self.safeLandingSpeed) then
-        self.ship:crash()
+        self.ship:crash(self.gravity)
         love.audio.play(SoundExplosion)
         print("INFO : Crash because of a speed")
         print("INFO : It's", self.magnitude, ", but maximum is", self.safeLandingSpeed)
         return
     end
     if (self.relativeHorizontalSpeed > self.safeLandingSlide) then
-        self.ship:crash()
+        self.ship:crash(self.gravity)
         love.audio.play(SoundExplosion)
         print("INFO : Crash because of a big horizontal slide relative to a landing platform")
         print("INFO : It's", self.relativeHorizontalSpeed, ", but maximum is", self.safeLandingSlide)
         return
     end
     if (self.relativeAngle > self.safeRelativeAngle) then
-        self.ship:crash()
+        self.ship:crash(self.gravity)
         love.audio.play(SoundExplosion)
         print("INFO : Crash because of a too big relative to landing platform ship angle")
         print("INFO : It's", self.relativeAngle, ", but maximum is", self.safeRelativeAngle)

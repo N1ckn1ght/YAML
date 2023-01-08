@@ -33,6 +33,8 @@ function Ship:init()
     self.polygons[3] = {self.size * k[5] * k[1], -self.size * k[2], -self.size * k[5] * k[3], -self.size * k[4], -self.size * 0.2, 0}
     self.polygons[4] = {self.size * k[5] * k[1],  self.size * k[2], -self.size * k[5] * k[3],  self.size * k[4], -self.size * 0.2, 0}
 
+    self.particles = {}
+
     -- Collision detection --
     
     -- todo: make more precise and non-convex collision (use {or} AND {or} checks for different convex parts)
@@ -67,6 +69,10 @@ function Ship:update(dt)
             self.fuel = self.fuel - self.fuelConsumption * dt
             self.isSpending = false
         end
+    else
+        for i = 1, #self.particles do
+            self.particles[i]:update(dt)
+        end
     end
 end
 
@@ -75,9 +81,9 @@ function Ship:draw(offsetX, offsetY, scaleX, scaleY)
     love.graphics.push()
     love.graphics.scale(scaleX, scaleY)
     love.graphics.translate(offsetX + self.location.x, offsetY + self.location.y)
-    love.graphics.rotate(self.heading)
 
     if (self.isAlive) then
+        love.graphics.rotate(self.heading)
         love.graphics.setColor(self.colorIdle)
         if (self.el) then
             self.el = false
@@ -102,6 +108,11 @@ function Ship:draw(offsetX, offsetY, scaleX, scaleY)
         love.graphics.setColor(self.colorLine)
         for i = 1, #self.polygons do
             love.graphics.polygon("line", self.polygons[i])
+        end
+    else
+        love.graphics.setColor(self.colorLine)
+        for i = 1, #self.particles do
+            self.particles[i]:draw()
         end
     end
 
@@ -138,9 +149,14 @@ function Ship:rotate(dt)
     end
 end
 
-function Ship:crash()
+function Ship:crash(gravity)
+    self.particles = {}
+    for i = 1, #self.polygons do
+        for j = 1, #self.polygons[i], 2 do
+            self.particles[#self.particles + 1] = Particle:create(Vector:create(self.polygons[i][j], self.polygons[i][j + 1]), Vector:create(self.polygons[i][(j + 1) % #self.polygons[i] + 1], self.polygons[i][(j + 2) % #self.polygons[i] + 1]), gravity)
+        end
+    end
     self.isAlive = false
-    
 end
 
 -- Collision detection --
