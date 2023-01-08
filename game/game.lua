@@ -19,8 +19,7 @@ function Game:init()
     self.cameras[2]   = Camera:create(Width * 0.5, Height * 0.5, self.ship, {150, 120, 150, 150})
     self.cameras[3]   = Camera:create(Width * 0.25, Height * 0.25, self.ship, {100, 80, 100, 80})
     self.camera = 1
-    -- self.terrain = Terrain:create(0, 200, 6000, 640, 0.6, 0.05, 20, self.ship.size * 2.25, self.ship.size * 4, 0.15, 0.1, {{20, 1}})
-    self.terrain = Terrain:create(0, 200, 10000, 640, 0.6, 0.05, 100, self.ship.size * 2.25, self.ship.size * 4, 0.15, 0.1, {{100, 1}})
+    self.terrain = Terrain:create(0, 200, 7200, 640, 0.75, 0.1, 40, self.ship.size * 2.25, self.ship.size * 4, 0.15, 0.1, {{30, 1}})
     self.collider = Collider:create(self, self.ship, self.terrain)
     
     self.nearestSegmentIndex = 1
