@@ -4,12 +4,14 @@ Segment.__index = Segment
 function Segment:create(p1, p2, score)
     local segment = {}
     setmetatable(segment, Segment)
+
     segment.p1      = p1
     segment.p2      = p2
     segment.score   = score or 0
     segment.mag     = nil
     segment.heading = nil
     segment.color   = nil
+
     segment:init()
     return segment
 end
@@ -21,8 +23,9 @@ function Segment:init()
     self:setScore(self.score)
 
     -- Collision detection --
-    self.normals  = {{-diff.y, diff.x}, {diff.x, diff.y}}
-    self.vertices = {{self.p1.x, Height * 2}, {self.p1.x, self.p1.y}, {self.p2.x, self.p2.y}}
+
+    self.vertices = {Vector:create(self.p1.x, Height * 2), self.p1, self.p2}
+    self.normals  = {Vector:create(-diff.y, diff.x), Vector:create(diff.x, diff.y)}
 end
 
 function Segment:draw(offsetX, offsetY, scaleX, scaleY)
@@ -57,20 +60,24 @@ end
 
 -- Collision detection --
 
+function Segment:getVertices()
+    return self.vertices
+end
+
 function Segment:getNormals()
     return self.normals
 end
 
-function Segment:getDots()
-    return {{p1.x, p1.y}, {p2.x, p2.y}}
-end
-
 function Segment:getMinMaxProj(axis)
-    local first  = dotProduct(self.p1, axis)
-    local second = dotProduct(self.p2, axis)
-    if (first > second) then
-        return {second, first}
-    else
-        return {first, second}
+    local min_proj = dotProduct(self.vertices[1], axis)
+    local max_proj = min_proj
+    for i = 2, #self.vertices do
+        local temp = dotProduct(self.vertices[i], axis)
+        if (temp < min_proj) then
+            min_proj = temp
+        elseif (temp > max_proj) then
+            max_proj = temp
+        end
     end
+    return min_proj, max_proj
 end

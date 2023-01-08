@@ -1,4 +1,5 @@
 require "game.camera"
+require "game.collider"
 require "game.game"
 require "game.segment"
 require "game.ship"
@@ -24,7 +25,6 @@ function love.load()
 end
 
 function love.update(dt)
-    
     -- 15 fps min limit (to avoid getting too big delta time when game window is not in focus)
     dt = math.min(dt, 0.067)
 
@@ -50,11 +50,6 @@ function love.keypressed(key)
     if (key == "g") then
         CurrentGame.camera = CurrentGame.camera % 2 + 1
         CurrentGame.cameras[2]:center()
-    end
-    if (key == "p") then
-        CurrentGame.cameras[CurrentGame.camera]:saveRelativePosition()
-        CurrentGame.ship.location.x = CurrentGame.ship.location.x - 300
-        CurrentGame.cameras[CurrentGame.camera]:loadRelativePosition()
     end
 end
 

@@ -1,7 +1,7 @@
 Terrain = {}
 Terrain.__index = Terrain
 
-function Terrain:create(x, y, width, height, angleDiffLimit, minLengthX, maxLenghtX, minLengthOfLandable, dangerousLengthOfLandable, angleOfLandable, angleOfSmoothering, tryGenerateGuaranteed)
+function Terrain:create(x, y, width, height, angleDiffLimit, minLengthX, maxLenghtX, minLengthOfLandable, dangerousLengthOfLandable, angleOfLandable, angleOfFlattening, tryGenerateGuaranteed)
     local terrain = {}
     setmetatable(terrain, Terrain)
     terrain.x = x
@@ -14,7 +14,7 @@ function Terrain:create(x, y, width, height, angleDiffLimit, minLengthX, maxLeng
     terrain.minLengthOfLandable = minLengthOfLandable
     terrain.dangerousLengthOfLandable = dangerousLengthOfLandable
     terrain.angleOfLandable = angleOfLandable
-    terrain.angleOfSmoothering = angleOfSmoothering
+    terrain.angleOfFlattening = angleOfFlattening
     -- Format: {{length by x, amount}, ...}
     terrain.guaranteed = tryGenerateGuaranteed
     terrain.segments = {}
@@ -35,7 +35,7 @@ function Terrain:init()
     local currentWidth = 0
     local tempSegmentLengths = {}
     while (currentWidth < randomWidth) do
-        local x = math.random()^(1/4) * length + self.minLengthX
+        local x = math.random()^2 * length + self.minLengthX
         tempSegmentLengths[#tempSegmentLengths + 1] = x
         currentWidth = currentWidth + x
     end
@@ -139,10 +139,14 @@ function Terrain:init()
         if (angle > -self.angleOfLandable) then
             angle = angle + fairRange
         end
-
+        if (angle >= -self.angleOfFlattening and angle <= self.angleOfFlattening) then
+            angle = 0
+        end
         if (angle >= -self.angleOfLandable and angle <= self.angleOfLandable) then
             gSegments[i] = true
-            angle = math.min(math.max(angle, -self.angleOfSmoothering), self.angleOfSmoothering)
+            if (gSegments[i - 1]) then
+                print("WARN : Bad generation at segment", i, "two landables in a row?")
+            end
         else
             gSegments[i] = false
         end
@@ -159,19 +163,6 @@ function Terrain:init()
     -- hotfix to make connected vertices between last and first (this leads to Issue 1)
     self.segments[#tempSegmentLengths] = Segment:create(Vector:create(previousPoint.x, previousPoint.y), Vector:create(previousPoint.x + tempSegmentLengths[#tempSegmentLengths], self.segments[1].p1.y))
 
-    -- hotfix for weird floating point error, also debug
-    for i = 1, #self.segments do
-        local diffX = self.segments[i].p2.x - self.segments[i].p1.x
-        local diffY = self.segments[i].p2.y - self.segments[i].p1.y
-        if (diffX < self.minLengthOfLandable and math.abs(math.atan2(diffY, diffX)) < self.angleOfLandable) then
-            self.segments[i]:setScore(0)
-            print("WARN : Segment", i, "is marked as landable but has length less then minLengthOfLandable")
-            print("     : angle", math.atan2(diffY, diffX), "length", diffX)
-            print("INFO : Segment set as NOT possible to land on.")
-            print("     : Mathematical error:", math.abs(self.angleOfLandable - math.abs(math.atan2(diffY, diffX))))
-        end
-    end
-
     -- set scores for platforms
     for i = 1, #self.segments do
         local prev = (i - 2) % #self.segments + 1
@@ -185,7 +176,7 @@ function Terrain:init()
             if (self.segments[i].p2.x - self.segments[i].p1.x <= self.dangerousLengthOfLandable) then
                 score = score * 1.5
             end
-            if (math.abs(self.segments[i].heading) > self.angleOfSmoothering) then
+            if (math.abs(self.segments[i].heading) > self.angleOfFlattening) then
                 score = score * 1.5
             end
             self.segments[i]:setScore(score)
