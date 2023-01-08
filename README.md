@@ -20,6 +20,8 @@ Escape - quit game
 
 F2 - restart game
 
+F - fullscreen mode (ON/OFF)
+
 ##### Debug (cheats)
 
 P - Remove all velocity and acceleration
