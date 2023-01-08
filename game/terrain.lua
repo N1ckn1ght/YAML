@@ -194,11 +194,63 @@ function Terrain:init()
 end
 
 function Terrain:draw(offsetX, offsetY, scaleX, scaleY)
-    -- Ok for small terrains, very bad for large #self.segments (Issue 5)
-    -- Solution is to get rid of full cycle
-    for i = 1, #self.segments do
-        self.segments[i]:draw(offsetX, offsetY, scaleX, scaleY)
-        self.segments[i]:draw(offsetX - self.width, offsetY, scaleX, scaleY)
-        self.segments[i]:draw(offsetX + self.width, offsetY, scaleX, scaleY)
+    -- find current segment
+    local nearest = self:findNearestSegment(offsetX)
+
+    -- draw [current; maximum to right]
+    local current = nearest
+    local m = 0
+    while ((self.segments[current].p1.x + self.width * m) * scaleX < -offsetX * scaleX + Width) do
+        self.segments[current]:draw(offsetX + self.width * m, offsetY, scaleX, scaleY)
+        current = current + 1
+        if (current > #self.segments) then
+            current = 1
+            m = m + 1
+        end
+    end
+
+    -- draw [maximum to left; current)
+    current = nearest - 1
+    m = 0
+    if (current == 0) then
+        current = #self.segments
+        m = -1
+    end
+    while ((self.segments[current].p2.x + self.width * m) * scaleX > -offsetX * scaleX - Width) do
+        self.segments[current]:draw(offsetX + self.width * m, offsetY, scaleX, scaleY)
+        current = current - 1
+        if (current < 1) then
+            current = #self.segments
+            m = m - 1
+        end
+    end
+end
+
+-- Will return index of a closest of segments to given x by p1
+function Terrain:findNearestSegment(x)
+    -- failsafe
+    if (x < self.x) then
+        return 1
+    elseif (x > self.segments[#self.segments].p1.x) then
+        return #self.segments
+    end
+    -- binary search
+    local iMin = 1
+    local iMax = #self.segments
+    while (iMin <= iMax) do
+        local iMid = math.floor((iMin + iMax) / 2)
+        if (self.segments[iMid].p1.x > x) then
+            iMax = iMid - 1
+        elseif (self.segments[iMid].p1.x < x) then
+            iMin = iMid + 1
+        else
+            return iMid
+        end
+    end
+    -- iMin = iMax + 1 after cycling
+    if (x - self.segments[iMax].p1.x < self.segments[iMin].p1.x - x) then
+        return iMax
+    else
+        return iMin
     end
 end

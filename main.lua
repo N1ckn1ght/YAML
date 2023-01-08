@@ -39,6 +39,7 @@ function love.draw()
     showStat(CurrentGame.ship.velocity.y, 120, 100, 240, FontSize, 0.7, 3, "spdY: ", "left")
     showStat(CurrentGame.ship.heading   , 120, 130, 240, FontSize, 0.7, 3, "head: ", "left")
     showStat(CurrentGame.ship.fuel      , 120, 160, 240, FontSize, 0.7, 3, "fuel: ", "left")
+    showStat(CurrentGame.terrain:findNearestSegment(CurrentGame.ship.location.x), 120, 190, 240, FontSize, 0.7, 0, "near: ", "left")
 end
 
 function love.keypressed(key)
