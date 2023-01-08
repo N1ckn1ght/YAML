@@ -1,7 +1,5 @@
 # YAML - Yet Another Moon Lander
 
-It's really in pre-alpha, but playable. 
-
 Try to land on colourful platforms only; be advised, it's impossible with bad relative angles, high speed and high slide (see red metrics in upper-right corner, if they appears, calibrate your spaceship!).
 
 Final score = Fuel x Platform Multiplier
