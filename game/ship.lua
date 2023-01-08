@@ -16,8 +16,10 @@ function Ship:create(x, y, size, engineAccel, engineAngle, fuel, fuelConsumption
     ship.engineAccel     = engineAccel
     ship.engineAngle     = engineAngle
     ship.size            = size
-    ship.colorFill       = {0, 1, 1, 1}
+    ship.colorIdle       = {0, 1, 1, 1}
+    self.colorFill       = {1, 0, 0, 1}
     ship.colorLine       = {1, 1, 1, 1}
+    ship.isAlive         = true
 
     ship:init()
     return ship
@@ -57,12 +59,14 @@ function Ship:init()
 end
 
 function Ship:update(dt)
-    self.velocity:add(self.acceleration * dt)
-    self.location:add(self.velocity * dt)
-    self.acceleration:mul(0)
-    if (self.isSpending) then
-        self.fuel = self.fuel - self.fuelConsumption * dt
-        self.isSpending = false
+    if (self.isAlive) then
+        self.velocity:add(self.acceleration * dt)
+        self.location:add(self.velocity * dt)
+        self.acceleration:mul(0)
+        if (self.isSpending) then
+            self.fuel = self.fuel - self.fuelConsumption * dt
+            self.isSpending = false
+        end
     end
 end
 
@@ -72,14 +76,35 @@ function Ship:draw(offsetX, offsetY, scaleX, scaleY)
     love.graphics.scale(scaleX, scaleY)
     love.graphics.translate(offsetX + self.location.x, offsetY + self.location.y)
     love.graphics.rotate(self.heading)
-    love.graphics.setColor(self.colorFill)
-    for i = 1, #self.polygons do
-        love.graphics.polygon("fill", self.polygons[i])
+
+    if (self.isAlive) then
+        love.graphics.setColor(self.colorIdle)
+        if (self.el) then
+            self.el = false
+            love.graphics.setColor(self.colorFill)
+        end
+        love.graphics.polygon("fill", self.polygons[4])
+        if (self.er) then
+            self.er = false
+            love.graphics.setColor(self.colorFill)
+        else
+            love.graphics.setColor(self.colorIdle)
+        end
+        love.graphics.polygon("fill", self.polygons[3])
+        if (self.up) then
+            self.up = false
+            love.graphics.setColor(self.colorFill)
+        else
+            love.graphics.setColor(self.colorIdle)
+        end
+        love.graphics.polygon("fill", self.polygons[1])
+        love.graphics.polygon("fill", self.polygons[2])
+        love.graphics.setColor(self.colorLine)
+        for i = 1, #self.polygons do
+            love.graphics.polygon("line", self.polygons[i])
+        end
     end
-    love.graphics.setColor(self.colorLine)
-    for i = 1, #self.polygons do
-        love.graphics.polygon("line", self.polygons[i])
-    end
+
     love.graphics.pop()
     love.graphics.setColor(r, g, b, a)
 end
@@ -94,6 +119,7 @@ function Ship:applyPower()
         local fy = self.engineAccel * math.sin(self.heading)
         self.isSpending = true
         self:applyForce(Vector:create(fx, fy))
+        self.up = true
     end
 end
 
@@ -104,6 +130,17 @@ function Ship:rotate(dt)
     elseif (self.heading > 0) then
         self.heading = 0
     end
+
+    if (dt < 0) then
+        self.el = true
+    else
+        self.er = true
+    end
+end
+
+function Ship:crash()
+    self.isAlive = false
+    
 end
 
 -- Collision detection --

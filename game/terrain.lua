@@ -130,7 +130,7 @@ function Terrain:init()
             if (randRange <= 0) then
                 print("ERROR: Fatal Terrain generation error, angleOfLandable and/or height are too strict!")
             else
-                print("INFO : SoT generation success (ignoring angleOfLandable for this segment)")
+                print("     : SoT generation success (ignoring angleOfLandable for this segment)")
             end
         end
 
@@ -218,7 +218,8 @@ function Terrain:draw(offsetX, offsetY, scaleX, scaleY)
 end
 
 -- Will return index of a closest of segments to given x by p1
-function Terrain:findNearestSegment(x)
+function Terrain:findNearestSegment(x, center)
+    center = center or false
     -- failsafe
     if (x < self.x) then
         return 1
@@ -228,18 +229,41 @@ function Terrain:findNearestSegment(x)
     -- binary search
     local iMin = 1
     local iMax = #self.segments
+
+    local add = 0
+
     while (iMin <= iMax) do
         local iMid = math.floor((iMin + iMax) / 2)
-        if (self.segments[iMid].p1.x > x) then
+
+        if (center) then
+            add = self.segments[iMid].p2.x - self.segments[iMid].p1.x
+        end
+
+        if (self.segments[iMid].p1.x + add > x) then
             iMax = iMid - 1
-        elseif (self.segments[iMid].p1.x < x) then
+        elseif (self.segments[iMid].p1.x + add < x) then
             iMin = iMid + 1
         else
             return iMid
         end
     end
     -- iMin = iMax + 1 after cycling
-    if (x - self.segments[iMax].p1.x < self.segments[iMin].p1.x - x) then
+
+    -- failsafe 2
+    if (iMax< 1) then
+        return 1
+    elseif (iMin > #self.segments) then
+        return #self.segments
+    end
+
+    local addMin = 0
+    local addMax = 0
+    if (center) then
+        addMin = self.segments[iMin].p2.x - self.segments[iMin].p1.x
+        addMax = self.segments[iMax].p2.x - self.segments[iMax].p1.x
+    end
+
+    if (x - self.segments[iMax].p1.x + addMax < self.segments[iMin].p1.x + addMin - x) then
         return iMax
     else
         return iMin

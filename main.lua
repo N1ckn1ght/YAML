@@ -21,6 +21,12 @@ function love.load()
     love.graphics.setFont(font)
     FontSize = 24
 
+    SoundTerrainApproach = love.audio.newSource("sound/terrain_safe.mp3", "static")
+    SoundTerrainDanger   = love.audio.newSource("sound/terrain_danger.mp3", "static")
+    SoundEngineUp        = love.audio.newSource("sound/travel.mp3", "static")
+    SoundEngineAngle     = love.audio.newSource("sound/rotate.mp3", "static")
+    SoundExplosion       = love.audio.newSource("sound/explosion.mp3", "static")
+
     CurrentGame = Game:create()
 end
 
@@ -33,23 +39,12 @@ end
 
 function love.draw()
     CurrentGame:draw()
-    showStat(CurrentGame.ship.location.x, 120, 10,  240, FontSize, 0.7, 3, "x   : ", "left")
-    showStat(CurrentGame.ship.location.y, 120, 40,  240, FontSize, 0.7, 3, "y   : ", "left")
-    showStat(CurrentGame.ship.velocity.x, 120, 70,  240, FontSize, 0.7, 3, "spdX: ", "left")
-    showStat(CurrentGame.ship.velocity.y, 120, 100, 240, FontSize, 0.7, 3, "spdY: ", "left")
-    showStat(CurrentGame.ship.heading   , 120, 130, 240, FontSize, 0.7, 3, "head: ", "left")
-    showStat(CurrentGame.ship.fuel      , 120, 160, 240, FontSize, 0.7, 3, "fuel: ", "left")
-    showStat(CurrentGame.terrain:findNearestSegment(CurrentGame.ship.location.x), 120, 190, 240, FontSize, 0.7, 0, "near: ", "left")
 end
 
 function love.keypressed(key)
     if (key == "f") then
         Fullscreen = not Fullscreen
         love.window.setFullscreen(Fullscreen, "exclusive")
-    end
-    if (key == "g") then
-        CurrentGame.camera = CurrentGame.camera % 2 + 1
-        CurrentGame.cameras[2]:center()
     end
 end
 
