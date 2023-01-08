@@ -32,8 +32,10 @@ P - Remove all velocity and acceleration
 
 ### Screenshots:
 
-![1](https://user-images.githubusercontent.com/50321432/211219372-3b265ef3-5533-4bff-b81e-b74eada5bb71.jpg)
-![2](https://user-images.githubusercontent.com/50321432/211219373-e8f2723f-c7a2-4894-b7b9-f02f7ef22632.jpg)
+![11](https://user-images.githubusercontent.com/50321432/211220649-c62d1363-8963-4015-b72a-ebde81bf4d42.jpg)
+![12](https://user-images.githubusercontent.com/50321432/211220650-364581da-0047-4d3b-a9d6-4bc2d29cd0d5.jpg)
+![13](https://user-images.githubusercontent.com/50321432/211220654-e0e1976c-fa81-4b2c-b05c-7a259c918c05.jpg)
+![14](https://user-images.githubusercontent.com/50321432/211220655-9236e40d-33c1-4fac-aeb7-56e2ea36d66f.jpg)
+
 ![3](https://user-images.githubusercontent.com/50321432/211219374-a983e100-86a4-47d8-96a1-ee1b2d33b62a.jpg)
 ![4](https://user-images.githubusercontent.com/50321432/211219376-6edb7619-8038-4946-aacf-193b24ac4a63.jpg)
-![5](https://user-images.githubusercontent.com/50321432/211219377-963a4f4d-dc56-4ac1-a959-23f9157b9e2e.jpg)
