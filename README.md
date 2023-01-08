@@ -8,9 +8,9 @@ Final score = Fuel x Platform Multiplier
 
 ##### Spaceship:
 
-W   - engine thrust
+W (Up) - engine thrust
 
-A / D - rotate your spaceship (also Left/Right works)
+A / D (Left / Right) - rotate
 
 Q / E - more precise rotation
 
@@ -20,17 +20,17 @@ Escape - quit game
 
 F2 - restart game
 
-F - fullscreen mode (ON/OFF)
+F - toggle fullscreen
 
 ##### Debug (cheats)
 
 P - Remove all velocity and acceleration
 
-\[ - Left velocity
+\[ - Get instant left velocity
 
-\] - Right velocity
+\] - Get instant right velocity
 
-\\ - Down velocity
+\\ - Get instant down velocity
 
 ### Screenshots:
 
